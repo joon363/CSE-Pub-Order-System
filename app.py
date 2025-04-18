@@ -8,23 +8,25 @@ CORS(app)
 orders = [
     {
         "id": 1,
+        "income": 10000,
         "time": "12:01",
         "name": "홍길동",
         "menus": {
-            "menu1": {"count": 2, "checked": [False, False]},
-            "menu2": {"count": 1, "checked": [False]},
-            "menu3": {"count": 0, "checked": []}
+            "menu1": {"count": 2, "checked": False},
+            "menu2": {"count": 1, "checked": False},
+            "menu3": {"count": 0, "checked": False}
         },
         "paid": False
     },
     {
         "id": 2,
+        "income": 20000,
         "time": "12:05",
         "name": "김철수",
         "menus": {
-            "menu1": {"count": 1, "checked": [False]},
-            "menu2": {"count": 0, "checked": []},
-            "menu3": {"count": 2, "checked": [False, False]}
+            "menu1": {"count": 1, "checked": False},
+            "menu2": {"count": 0, "checked": False},
+            "menu3": {"count": 2, "checked": False}
         },
         "paid": False
     }
@@ -34,30 +36,28 @@ orders = [
 def get_orders():
     return jsonify(orders)
 
-@app.route("/orders/<int:order_id>/toggle", methods=["POST"])
-def toggle_check(order_id):
+@app.route("/orders/<int:order_id>", methods=["PUT"])
+def update_order(order_id):
     data = request.json
-    menu_key = data.get("menu")
-    index = data.get("index")
 
-    for order in orders:
-        if order["id"] == order_id and menu_key in order["menus"]:
-            try:
-                current = order["menus"][menu_key]["checked"][index]
-                order["menus"][menu_key]["checked"][index] = not current
-                return jsonify({"success": True, "new_state": not current})
-            except IndexError:
-                return jsonify({"success": False, "error": "Index out of range"}), 400
-
-    return jsonify({"success": False, "error": "Order or menu not found"}), 404
-
-@app.route("/orders/<int:order_id>/confirm", methods=["POST"])
-def toggle_payment(order_id):
-    for order in orders:
+    for i, order in enumerate(orders):
         if order["id"] == order_id:
-            order["paid"] = not order["paid"]
-            return jsonify({"success": True, "paid": order["paid"]})
+            orders[i] = data
+            return jsonify({"success": True, "updated": data})
+
     return jsonify({"success": False, "error": "Order not found"}), 404
+
+
+@app.route("/orders/new", methods=["POST"])
+def create_order():
+    data = request.json
+
+    # 새로운 ID 부여: 가장 마지막 ID보다 1 큰 값
+    new_id = max(order["id"] for order in orders) + 1 if orders else 1
+    data["id"] = new_id
+
+    orders.append(data)
+    return jsonify({"success": True, "created": data}), 201
 
 if __name__ == "__main__":
     app.run(debug=True)
