@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '../models/order.dart';
 import '../services/order_service.dart';
 import '../widgets/order_row_widget.dart';
@@ -14,37 +15,40 @@ class _OrderTablePageState extends State<OrderTablePage> {
   final OrderService _orderService = OrderService();
   List<Order> _orders = [];
   bool _isLoading = true;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     _fetchOrders();
+    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
+      print("Audo feching...");
+      _fetchOrders();
+    });
   }
 
   Future<void> _fetchOrders() async {
     try {
-      final orders = await _orderService.fetchOrders();
+      print("Fetching Order");
+      _orders = await _orderService.fetchOrders();
       setState(() {
-        _orders = orders;
         _isLoading = false;
       });
+      print("Order Fetched");
     } catch (e) {
-      // 오류 처리
+      throw Exception(e);
     }
   }
 
   void _updateOrder(Order order) async {
-    setState(() {}); // 로컬 상태 먼저 반영
+    print("Updating order");
     await _orderService.updateOrder(order); // 서버에 업데이트
+    await _fetchOrders();
+    print("Order updated");
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Order> sortedOrders = [
-      ..._orders.where((o) => !o.isCompleted),
-      ..._orders.where((o) => o.isCompleted),
-    ];
-
     return Scaffold(
       appBar: AppBar(title: const Text("주문 테이블")),
       body: _isLoading
@@ -53,11 +57,12 @@ class _OrderTablePageState extends State<OrderTablePage> {
         children: [
           _buildHeader(),
           Expanded(
+            flex: 1,
             child: ListView.builder(
-              itemCount: sortedOrders.length,
+              itemCount: _orders.length,
               itemBuilder: (context, index) {
                 return OrderRowWidget(
-                  order: sortedOrders[index],
+                  order: _orders[index],
                   onChanged: _updateOrder,
                 );
               },
@@ -68,12 +73,21 @@ class _OrderTablePageState extends State<OrderTablePage> {
     );
   }
 
-  Widget _buildHeader() {
-    List<int> totalMenuCounts = List.generate(3, (_) => 0);
-    for (var order in _orders) {
-      for (int i = 0; i < 3; i++) {
-        totalMenuCounts[i] += order.menuQuantities[i];
+
+  Widget _buildHeader({bool isDone=false}) {
+    int totalMenuCounts (int i) {
+      int t = 0;
+      for (var order in _orders) {
+        t += order.menuChecked[i]?0:order.menuQuantities[i];
       }
+      return t;
+    }
+    int totalIncome () {
+      int t = 0;
+      for (var order in _orders) {
+        t += order.income;
+      }
+      return t;
     }
 
     return Container(
@@ -86,12 +100,14 @@ class _OrderTablePageState extends State<OrderTablePage> {
           ...List.generate(3, (i) {
             return Expanded(
               flex: 3,
-              child: Text("메뉴 ${i + 1} (잔여: ${totalMenuCounts[i]}개)",
+              child:
+              Text(isDone?"메뉴 ${i + 1}":"메뉴 ${i + 1} (잔여: ${totalMenuCounts(i)}개)",
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontWeight: FontWeight.bold)),
             );
           }),
           const Expanded(flex: 2, child: Text("결제 확인", style: TextStyle(fontWeight: FontWeight.bold))),
+          Expanded(flex: 2, child: Text("총액: ${totalIncome()}", style: TextStyle(fontWeight: FontWeight.bold))),
         ],
       ),
     );

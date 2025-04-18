@@ -1,13 +1,15 @@
 class Order {
-  final String id;
+  final int id;
+  final int income;
   final String time;
   final String name;
   final List<int> menuQuantities;
-  final List<int> menuChecked;
+  final List<bool> menuChecked;
   bool isPaid;
 
   Order({
     required this.id,
+    required this.income,
     required this.time,
     required this.name,
     required this.menuQuantities,
@@ -16,31 +18,56 @@ class Order {
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
+    final menus = json['menus'] as Map<String, dynamic>;
+
+    // 메뉴 key의 정렬된 순서를 보장
+    final sortedMenuKeys = ['menu1', 'menu2', 'menu3'];
+
+    final quantities = <int>[];
+    final checked = <bool>[];
+
+    for (var key in sortedMenuKeys) {
+      quantities.add(menus[key]['count'] as int);
+      checked.add(menus[key]['checked'] as bool);
+    }
+
     return Order(
-      id: json['id'],
-      time: json['time'],
-      name: json['name'],
-      menuQuantities: List<int>.from(json['menuQuantities']),
-      menuChecked: List<int>.from(json['menuChecked']),
-      isPaid: json['isPaid'],
+      id: json['id'] as int,
+      income: json['income'] as int,
+      time: json['time'] as String,
+      name: json['name'] as String,
+      menuQuantities: quantities,
+      menuChecked: checked,
+      isPaid: json['paid'] as bool,
     );
   }
 
   Map<String, dynamic> toJson() {
+    final menuMap = <String, dynamic>{};
+
+    final sortedMenuKeys = ['menu1', 'menu2', 'menu3'];
+
+    for (int i = 0; i < sortedMenuKeys.length; i++) {
+      menuMap[sortedMenuKeys[i]] = {
+        'checked': menuChecked[i],
+        'count': menuQuantities[i],
+      };
+    }
+
     return {
       'id': id,
+      'income': income,
       'time': time,
       'name': name,
-      'menuQuantities': menuQuantities,
-      'menuChecked': menuChecked,
-      'isPaid': isPaid,
+      'menus': menuMap,
+      'paid': isPaid,
     };
   }
 
   bool get isCompleted {
     for (int i = 0; i < menuQuantities.length; i++) {
-      if (menuChecked[i] < menuQuantities[i]) return false;
+      if (menuQuantities[i]!=0&&menuChecked[i]==false) return false;
     }
-    return true;
+    return isPaid;
   }
 }

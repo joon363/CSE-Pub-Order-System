@@ -26,11 +26,7 @@ class _OrderRowWidgetState extends State<OrderRowWidget> {
 
   void _toggleMenuCheck(int index, bool? checked) {
     setState(() {
-      if (checked == true && _order.menuChecked[index] < _order.menuQuantities[index]) {
-        _order.menuChecked[index]++;
-      } else if (checked == false && _order.menuChecked[index] > 0) {
-        _order.menuChecked[index]--;
-      }
+      _order.menuChecked[index]=checked??false;
     });
     widget.onChanged(_order);
   }
@@ -55,10 +51,15 @@ class _OrderRowWidgetState extends State<OrderRowWidget> {
             if (_order.menuQuantities[i] == 0) return const Expanded(flex: 3, child: SizedBox());
             return Expanded(
               flex: 3,
-              child: Checkbox(
-                value: _order.menuChecked[i] < _order.menuQuantities[i],
-                onChanged: (val) => _toggleMenuCheck(i, val),
-              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                Text('${_order.menuQuantities[i]}'),
+                Checkbox(
+                  value: _order.menuChecked[i],
+                  onChanged: (val) => _toggleMenuCheck(i, val),
+                ),
+              ],)
             );
           }),
           Expanded(
@@ -67,6 +68,10 @@ class _OrderRowWidgetState extends State<OrderRowWidget> {
               value: _order.isPaid,
               onChanged: _togglePayment,
             ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text('${_order.income}', textAlign: TextAlign.center,),
           ),
         ],
       ),
