@@ -34,8 +34,8 @@ class _OrderPageState extends State<OrderPage> {
   List<int> menuCounts = [0,0,0];
   int tableno = 3;
   final List<MenuItem> menuItems = [
-    MenuItem(name: '삼겹살 (180g)', index: 0, price: 6500, imageUrl: 'assets/samg.jpg'),
-    MenuItem(name: '껍데기 (200g)', index: 1, price: 5500, imageUrl: 'assets/ggup.jpg'),
+    MenuItem(name: '삼겹살 (100g)', index: 0, price: 6500, imageUrl: 'assets/samg.jpg'),
+    MenuItem(name: '껍데기 (100g)', index: 1, price: 5500, imageUrl: 'assets/ggup.jpg'),
     MenuItem(name: '비빔면', index: 2, price: 3000, imageUrl: 'assets/bibim.jpg'),
     MenuItem(name: '불닭게티(2인분)', index: 3, price: 5500, imageUrl: 'assets/buldark.jpg'),
     MenuItem(name: '세트A', index: 4, price: 5000, imageUrl: 'assets/setA.png'),
