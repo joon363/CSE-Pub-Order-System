@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:cse_pub_client/themes.dart';
 import 'package:cse_pub_client/pages/order_table_page.dart';
 import 'package:cse_pub_client/models/menus.dart';
+import 'package:cse_pub_client/services/order_service.dart';
 import 'dart:convert';
 
 
@@ -95,7 +96,7 @@ class _OrderPageState extends State<OrderPage> {
     };
 
     final response = await http.post(
-      Uri.parse("http://localhost:5000/orders/new"), // 서버 주소 수정 가능
+      Uri.parse("'$baseUrl/orders/new'"), // 서버 주소 수정 가능
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(newOrder),
     );
@@ -150,7 +151,7 @@ class _OrderPageState extends State<OrderPage> {
                 final password = _pwController.text.trim();
 
                 final res = await http.post(
-                  Uri.parse('http://localhost:5000/checkPassword'),
+                  Uri.parse('$baseUrl/checkPassword'),
                   headers: {'Content-Type': 'application/json'},
                   body: jsonEncode({'password': password}),
                 );

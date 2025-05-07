@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/order.dart';
+final String baseUrl = "http://172.31.7.222:5000";
 
 class OrderService {
-  final String baseUrl = "http://127.0.0.1:5000"; // 실제 API 주소로 교체
 
   Future<List<Order>> fetchOrders() async {
     final response = await http.get(Uri.parse('$baseUrl/orders'));
