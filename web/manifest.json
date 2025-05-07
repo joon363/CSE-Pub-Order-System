@@ -1,6 +1,6 @@
 {
-    "name": "cse_pub",
-    "short_name": "cse_pub",
+    "name": "cse_pub_client",
+    "short_name": "cse_pub_client",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

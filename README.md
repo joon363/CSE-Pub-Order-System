@@ -1,4 +1,4 @@
-# cse_pub
+# cse_pub_client
 
 A new Flutter project.
 
