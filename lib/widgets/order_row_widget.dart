@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/order.dart';
+import 'package:cse_pub_client/models/menus.dart';
 
 class OrderRowWidget extends StatefulWidget {
   final Order order;
@@ -47,7 +48,8 @@ class _OrderRowWidgetState extends State<OrderRowWidget> {
         children: [
           Expanded(flex: 2, child: Text(_order.time)),
           Expanded(flex: 2, child: Text(_order.name)),
-          ...List.generate(3, (i) {
+          Expanded(flex: 2, child: Text(_order.tableID.toString())),
+          ...List.generate(menuCount, (i) {
             if (_order.menuQuantities[i] == 0) return const Expanded(flex: 3, child: SizedBox());
             return Expanded(
                 flex: 3,

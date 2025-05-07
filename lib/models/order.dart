@@ -1,6 +1,13 @@
+import 'package:cse_pub_client/models/menus.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:cse_pub_client/themes.dart';
+import 'package:cse_pub_client/models/menus.dart';
+import 'dart:convert';
 class Order {
   final int id;
   final int income;
+  final int tableID;
   final String time;
   final String name;
   final List<int> menuQuantities;
@@ -10,6 +17,7 @@ class Order {
   Order({
     required this.id,
     required this.income,
+    required this.tableID,
     required this.time,
     required this.name,
     required this.menuQuantities,
@@ -20,13 +28,10 @@ class Order {
   factory Order.fromJson(Map<String, dynamic> json) {
     final menus = json['menus'] as Map<String, dynamic>;
 
-    // 메뉴 key의 정렬된 순서를 보장
-    final sortedMenuKeys = ['menu1', 'menu2', 'menu3'];
-
     final quantities = <int>[];
     final checked = <bool>[];
 
-    for (var key in sortedMenuKeys) {
+    for (var key in menuKeys) {
       quantities.add(menus[key]['count'] as int);
       checked.add(menus[key]['checked'] as bool);
     }
@@ -34,6 +39,7 @@ class Order {
     return Order(
       id: json['id'] as int,
       income: json['income'] as int,
+      tableID: json['tableID'] as int,
       time: json['time'] as String,
       name: json['name'] as String,
       menuQuantities: quantities,
@@ -44,11 +50,8 @@ class Order {
 
   Map<String, dynamic> toJson() {
     final menuMap = <String, dynamic>{};
-
-    final sortedMenuKeys = ['menu1', 'menu2', 'menu3'];
-
-    for (int i = 0; i < sortedMenuKeys.length; i++) {
-      menuMap[sortedMenuKeys[i]] = {
+    for (int i = 0; i < menuCount; i++) {
+      menuMap[menuKeys[i]] = {
         'checked': menuChecked[i],
         'count': menuQuantities[i],
       };
@@ -57,6 +60,7 @@ class Order {
     return {
       'id': id,
       'income': income,
+      'tableID': tableID,
       'time': time,
       'name': name,
       'menus': menuMap,

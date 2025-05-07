@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import '../models/order.dart';
+import '../models/menus.dart';
 import '../services/order_service.dart';
 import '../widgets/order_row_widget.dart';
 
@@ -22,7 +23,7 @@ class _OrderTablePageState extends State<OrderTablePage> {
     super.initState();
     _fetchOrders();
     _timer = Timer.periodic(Duration(seconds: 3), (timer) {
-      print("Audo feching...");
+      print("Audo fetching...");
       _fetchOrders();
     });
   }
@@ -97,13 +98,21 @@ class _OrderTablePageState extends State<OrderTablePage> {
         children: [
           const Expanded(flex: 2, child: Text("주문 시간", style: TextStyle(fontWeight: FontWeight.bold))),
           const Expanded(flex: 2, child: Text("주문자", style: TextStyle(fontWeight: FontWeight.bold))),
-          ...List.generate(3, (i) {
+          const Expanded(flex: 2, child: Text("테이블", style: TextStyle(fontWeight: FontWeight.bold))),
+          ...List.generate(menuCount, (i) {
             return Expanded(
               flex: 3,
               child:
-              Text(isDone?"메뉴 ${i + 1}":"메뉴 ${i + 1} (잔여: ${totalMenuCounts(i)}개)",
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Column(
+                    children: [
+                      Text(menuDisplayNames[i],
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                      if(!isDone)Text(
+                        "(잔여: ${totalMenuCounts(i)}개)",
+                      )
+                    ],
+                  )
             );
           }),
           const Expanded(flex: 2, child: Text("결제 확인", style: TextStyle(fontWeight: FontWeight.bold))),

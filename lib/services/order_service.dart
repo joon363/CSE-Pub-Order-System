@@ -8,7 +8,6 @@ class OrderService {
   Future<List<Order>> fetchOrders() async {
     final response = await http.get(Uri.parse('$baseUrl/orders'));
     if (response.statusCode == 200) {
-      //print(response.body);
       List<dynamic> data = json.decode(response.body);
       return data.map((item) => Order.fromJson(item)).toList();
     } else {

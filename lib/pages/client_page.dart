@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:cse_pub_client/themes.dart';
+import 'package:cse_pub_client/pages/order_table_page.dart';
+import 'package:cse_pub_client/models/menus.dart';
 import 'dart:convert';
 
-class MenuItem {
-  final String name;
-  final int index;
-  final int price;
-  final String imageUrl;
 
-  MenuItem({required this.name, required this.index, required this.price, required this.imageUrl});
-}
 class OrderPage extends StatefulWidget {
   @override
   _OrderPageState createState() => _OrderPageState();
@@ -19,16 +14,9 @@ class OrderPage extends StatefulWidget {
 class _OrderPageState extends State<OrderPage> {
   final TextEditingController _tableController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-  List<int> menuCounts = [0,0,0];
+  List<int> menuCounts = [0,0,0,0,0,0];
   bool isChecked = false;
-  final List<MenuItem> menuItems = [
-    MenuItem(name: '삼겹살 (100g)', index: 0, price: 6500, imageUrl: 'assets/samg.jpg'),
-    MenuItem(name: '껍데기 (100g)', index: 1, price: 5500, imageUrl: 'assets/ggup.jpg'),
-    MenuItem(name: '비빔면', index: 2, price: 3000, imageUrl: 'assets/bibim.jpg'),
-    MenuItem(name: '불닭게티(2인분)', index: 3, price: 5500, imageUrl: 'assets/buldark.jpg'),
-    MenuItem(name: '세트A', index: 4, price: 5000, imageUrl: 'assets/setA.png'),
-    MenuItem(name: '세트B', index: 5, price: 3500, imageUrl: 'assets/setB.png'),
-  ];
+
   Map<MenuItem, int> order = {};
 
   void addToOrder(MenuItem item) {
@@ -43,7 +31,6 @@ class _OrderPageState extends State<OrderPage> {
 
   void decreaseQty(MenuItem item) {
     setState(() {
-      menuCounts[item.index];
       if (order.containsKey(item)) {
         if (order[item]! > 1) {
           order[item] = order[item]! - 1;
@@ -63,6 +50,7 @@ class _OrderPageState extends State<OrderPage> {
     });
     return total;
   }
+
   Future<void> _showMessage(String text) async {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -94,17 +82,16 @@ class _OrderPageState extends State<OrderPage> {
       _showMessage('입금 후 체크해주세요');
       return;
     }
-
     final Map<String, dynamic> newOrder = {
       "income": totalPrice,
       "time": TimeOfDay.now().format(context),
       "name": name,
+      "tableID": int.tryParse(_tableController.text.trim()),
       "menus": {
-        "menu1": {"count": menuCounts[0], "checked": false},
-        "menu2": {"count": menuCounts[1], "checked": false},
-        "menu3": {"count": menuCounts[2], "checked": false}
+        for (int i = 0; i < menuItems.length; i++)
+          "menu$i": {"count": menuCounts[i], "checked": false}
       },
-      "paid": false
+      "paid": false,
     };
 
     final response = await http.post(
@@ -140,6 +127,60 @@ class _OrderPageState extends State<OrderPage> {
       ],
     );
   }
+  Future<void> _showPasswordDialog(BuildContext context) async {
+    final TextEditingController _pwController = TextEditingController();
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('관리자 페이지 진입'),
+          content: TextField(
+            controller: _pwController,
+            obscureText: true,
+            decoration: InputDecoration(hintText: '비밀번호'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final password = _pwController.text.trim();
+
+                final res = await http.post(
+                  Uri.parse('http://localhost:5000/checkPassword'),
+                  headers: {'Content-Type': 'application/json'},
+                  body: jsonEncode({'password': password}),
+                );
+
+                if (res.statusCode == 200) {
+                  final body = jsonDecode(res.body);
+                  if (body['success'] == true) {
+                    Navigator.of(context).pop(true); // 승인됨
+                    return;
+                  }
+                }
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('비밀번호가 틀렸습니다')),
+                );
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => OrderTablePage()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,6 +189,16 @@ class _OrderPageState extends State<OrderPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.lock),
+                  onPressed: () => _showPasswordDialog(context),
+                  tooltip: '관리자 로그인',
+                )
+              ],
+            ),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -211,7 +262,6 @@ class _OrderPageState extends State<OrderPage> {
                 },
               ),
             ),
-            const Divider(thickness: 2),
             Container(
               decoration: BoxDecoration(
                   color: Colors.grey[100],
@@ -266,7 +316,7 @@ class _OrderPageState extends State<OrderPage> {
                       ],
                     );
                   }).toList(),
-                  const Divider(),
+                  //const Divider(),
                   Row(
                     children: [
                       const Expanded(child: SizedBox()),
@@ -302,14 +352,18 @@ class _OrderPageState extends State<OrderPage> {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('입금하였습니다!'),
-                    Checkbox(
-                      value: isChecked,
-                      onChanged: (bool? newValue) {
-                        setState(() {
-                          isChecked = newValue ?? false;
-                        });
-                      },
+                    Row(
+                      children: [
+                        Text('입금하였습니다!'),
+                        Checkbox(
+                          value: isChecked,
+                          onChanged: (bool? newValue) {
+                            setState(() {
+                              isChecked = newValue ?? false;
+                            });
+                          },
+                        ),
+                      ],
                     ),
                     ElevatedButton(
                       onPressed: _submitOrder,
@@ -319,7 +373,8 @@ class _OrderPageState extends State<OrderPage> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            Text('(티켓 선불 구매하신 테이블은 그냥 체크하시면 됩니다!)'),
+            SizedBox(height: 40),
           ],
         ),
       ),
