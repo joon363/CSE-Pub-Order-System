@@ -96,7 +96,7 @@ class _OrderPageState extends State<OrderPage> {
     };
 
     final response = await http.post(
-      Uri.parse("'$baseUrl/orders/new'"), // 서버 주소 수정 가능
+      Uri.parse("$baseUrl/orders/new"), // 서버 주소 수정 가능
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(newOrder),
     );
