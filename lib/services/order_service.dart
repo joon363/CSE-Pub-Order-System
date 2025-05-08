@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/order.dart';
-final String baseUrl = "http://52.78.133.138:5000";
+final String baseUrl = "https://csepub.shop";
 
 class OrderService {
 

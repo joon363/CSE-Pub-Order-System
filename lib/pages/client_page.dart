@@ -148,25 +148,32 @@ class _OrderPageState extends State<OrderPage> {
             ),
             TextButton(
               onPressed: () async {
-                final password = _pwController.text.trim();
+                try{
 
-                final res = await http.post(
-                  Uri.parse('$baseUrl/checkPassword'),
-                  headers: {'Content-Type': 'application/json'},
-                  body: jsonEncode({'password': password}),
-                );
+                  final password = _pwController.text.trim();
 
-                if (res.statusCode == 200) {
-                  final body = jsonDecode(res.body);
-                  if (body['success'] == true) {
-                    Navigator.of(context).pop(true); // 승인됨
-                    return;
+                  final res = await http.post(
+                    Uri.parse('$baseUrl/checkPassword'),
+                    headers: {'Content-Type': 'application/json'},
+                    body: jsonEncode({'password': password}),
+                  );
+
+                  if (res.statusCode == 200) {
+                    final body = jsonDecode(res.body);
+                    if (body['success'] == true) {
+                      Navigator.of(context).pop(true); // 승인됨
+                      return;
+                    }
                   }
-                }
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('비밀번호가 틀렸습니다')),
-                );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('비밀번호가 틀렸습니다')),
+                  );
+
+                }
+                catch (e){
+                  throw Exception (e);
+                }
               },
               child: Text('확인'),
             ),
