@@ -194,7 +194,7 @@ class _OrderPageState extends State<OrderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             Row(
@@ -248,17 +248,17 @@ class _OrderPageState extends State<OrderPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Image.asset(item.imageUrl),//, height:100),
-                          const SizedBox(height: 8),
-                          Padding(padding: EdgeInsets.symmetric(horizontal: 16),
+                          Image.asset(item.imageUrl),
+                          Padding(padding: EdgeInsets.symmetric(horizontal: 4),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(item.name, style: const TextStyle(fontSize: 14)),
-                                Text('${item.price}원', style: const TextStyle(fontSize: 12)),
+                                Text('${item.price}원', style: const TextStyle(fontSize: 14)),
                               ],
                             ),
-                          )
+                          ),
+                          Container(),
                         ],
                       ),
                     ),
@@ -357,8 +357,9 @@ class _OrderPageState extends State<OrderPage> {
                   //mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('입금하였습니다!'),
+                        Text('입금 완료'),
                         Checkbox(
                           value: isChecked,
                           onChanged: (bool? newValue) {
