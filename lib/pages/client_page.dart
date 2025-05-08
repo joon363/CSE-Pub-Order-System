@@ -379,7 +379,10 @@ class _OrderPageState extends State<OrderPage> {
               ],
             ),
             Text('(티켓 선불 구매한 테이블은 그냥 체크하세요!)',style: TextStyle(fontSize: 12)),
-            SizedBox(height: 40),
+            Container(
+              height: 40,
+              child: Text('made by JunHyeok Park',style: TextStyle(fontSize: 12)),
+            ),
           ],
         ),
       ),

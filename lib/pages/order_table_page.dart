@@ -44,7 +44,6 @@ class _OrderTablePageState extends State<OrderTablePage> {
   void _updateOrder(Order order) async {
     print("Updating order");
     await _orderService.updateOrder(order); // 서버에 업데이트
-    await _fetchOrders();
     print("Order updated");
   }
 
@@ -62,8 +61,10 @@ class _OrderTablePageState extends State<OrderTablePage> {
             child: ListView.builder(
               itemCount: _orders.length,
               itemBuilder: (context, index) {
+                final order = _orders[index];
                 return OrderRowWidget(
-                  order: _orders[index],
+                  key: ValueKey(order.hashCode), // <- 고유 식별자 부여!
+                  order: order,
                   onChanged: _updateOrder,
                 );
               },
