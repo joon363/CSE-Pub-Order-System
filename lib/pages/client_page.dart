@@ -90,7 +90,7 @@ class _OrderPageState extends State<OrderPage> {
       "tableID": int.tryParse(_tableController.text.trim()),
       "menus": {
         for (int i = 0; i < menuItems.length; i++)
-          "menu$i": {"count": menuCounts[i], "checked": false}
+          "menu$i": {"count": menuCounts[i]??0, "checked": false}
       },
       "paid": false,
     };
@@ -105,7 +105,7 @@ class _OrderPageState extends State<OrderPage> {
       _showMessage('주문이 완료되었습니다!');
       setState(() {
         _nameController.clear();
-        menuCounts = [0,0,0];
+        menuCounts = [0,0,0,0,0,0];
         order={};
       });
     } else {
@@ -378,6 +378,7 @@ class _OrderPageState extends State<OrderPage> {
                 ),
               ],
             ),
+            Text('79421341787 카카오뱅크',style: TextStyle(fontSize: 14, color: Colors.blue)),
             Text('(티켓 선불 구매한 테이블은 그냥 체크하세요!)',style: TextStyle(fontSize: 12)),
             Container(
               height: 40,
