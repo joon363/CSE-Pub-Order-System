@@ -194,12 +194,32 @@ class _OrderPageState extends State<OrderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(4.0),
         child: Column(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: primaryColorLight
+                      ),
+                      height: 60,
+                      child:
+                      Image.asset(
+                        'assets/cse.jpg',
+                      ),
+                    ),
+                    SizedBox(width: 10,),
+                    Text('미디움레어\n작성원리', style: TextStyle(fontSize: 24),),
+                  ],
+                ),
                 IconButton(
                   icon: Icon(Icons.lock),
                   onPressed: () => _showPasswordDialog(context),
@@ -207,38 +227,14 @@ class _OrderPageState extends State<OrderPage> {
                 )
               ],
             ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: primaryColorLight
-                  ),
-                  height: 100,
-                  child:
-                  Image.asset(
-                    'assets/cse.jpg',
-                  ),
-                ),
-                SizedBox(width: 10,),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('미디움레어 작성원리', style: TextStyle(fontSize: 24),),
-                  ],
-                ),
-              ],
-            ),
             Expanded(
               child: GridView.builder(
-                padding: const EdgeInsets.all(8),
+                //padding: const EdgeInsets.all(4),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2, // 2열
-                  childAspectRatio: 1/1,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
+                  childAspectRatio: 4/3,
+                  crossAxisSpacing: 4,
+                  mainAxisSpacing: 4,
                 ),
                 itemCount: menuItems.length,
                 itemBuilder: (context, index) {
@@ -247,19 +243,19 @@ class _OrderPageState extends State<OrderPage> {
                     onTap: () => addToOrder(item),
                     child: Card(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12), bottomRight: Radius.circular(12)),
                       ),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Image.asset(item.imageUrl, height: 120,),
+                          Image.asset(item.imageUrl),//, height:100),
                           const SizedBox(height: 8),
                           Padding(padding: EdgeInsets.symmetric(horizontal: 16),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(item.name, style: const TextStyle(fontSize: 14)),
-                                Text('${item.price}원', style: const TextStyle(fontSize: 14)),
+                                Text('${item.price}원', style: const TextStyle(fontSize: 12)),
                               ],
                             ),
                           )
@@ -358,7 +354,7 @@ class _OrderPageState extends State<OrderPage> {
                 )),
                 SizedBox(width: 20),
                 Column(
-                  mainAxisSize: MainAxisSize.min,
+                  //mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       children: [
@@ -381,7 +377,7 @@ class _OrderPageState extends State<OrderPage> {
                 ),
               ],
             ),
-            Text('(티켓 선불 구매하신 테이블은 그냥 체크하시면 됩니다!)'),
+            Text('(티켓 선불 구매한 테이블은 그냥 체크하세요!)',style: TextStyle(fontSize: 12)),
             SizedBox(height: 40),
           ],
         ),
