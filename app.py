@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -7,6 +7,18 @@ import os
 
 app = Flask(__name__)
 CORS(app)
+
+@app.after_request
+def add_cors_headers(response):
+    # origin = request.headers.get('Origin')
+    # if origin:
+    #     response.headers['Access-Control-Allow-Origin'] = origin  # 보안 필요 시 지정된 도메인만 허용
+    # else:
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    return response
 
 # SQLite DB 설정
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///orders.db'
@@ -39,6 +51,14 @@ with app.app_context():
     if not os.path.exists("orders.db"):
         db.create_all()
 
+# ✅ OPTIONS 사전 요청 처리 라우팅
+@app.route("/orders", methods=["OPTIONS"])
+@app.route("/orders/<int:order_id>", methods=["OPTIONS"])
+@app.route("/orders/new", methods=["OPTIONS"])
+@app.route("/checkPassword", methods=["OPTIONS"])
+def handle_options(*args, **kwargs):
+    response = make_response()
+    return add_cors_headers(response)
 
 # ✅ GET: 모든 주문 조회
 @app.route("/orders", methods=["GET"])
